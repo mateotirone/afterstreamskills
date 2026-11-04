@@ -1,0 +1,26 @@
+# Builds one zip per skill plus all-skills.zip and publishes them as the latest release.
+# Uses only the built-in GITHUB_TOKEN. No secrets.
+name: release
+on:
+  push:
+    branches: [main]
+    paths: ['*/SKILL.md', '*/**', 'README.md']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build zips
+        run: |
+          mkdir -p dist
+          for d in */; do s=${d%/}; [ -f "$s/SKILL.md" ] || continue; zip -qr "dist/$s.zip" "$s"; done
+          zip -qr dist/all-skills.zip $(for d in */; do [ -f "$d/SKILL.md" ] && echo "${d%/}"; done) README.md
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(date -u +%Y.%m.%d)-${GITHUB_RUN_NUMBER}"
+          gh release create "$tag" dist/*.zip --title "Afterstream skills $tag" --notes "Download one skill, or all-skills.zip for the whole pack. Install steps are in the README." --latest
