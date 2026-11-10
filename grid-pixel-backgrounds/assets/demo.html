@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grid and pixel backgrounds demo</title>
+<link rel="stylesheet" href="patterns.css">
+<style>
+  body { margin: 0; background: var(--bg-base); color: #888; font: 15px/1.4 system-ui, sans-serif; }
+  .grid { display: grid; gap: 16px; padding: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .gp-stage { aspect-ratio: 16 / 9; border-radius: 12px; border: 1px solid var(--bg-line-strong); }
+  .gp-stage b { position: absolute; left: 14px; top: 12px; font: 600 12px ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; }
+  .bar { padding: 16px 16px 0; } .bar button { font: inherit; padding: 6px 12px; }
+</style>
+</head>
+<body>
+<div class="bar"><button onclick="setTheme('dark')">Dark</button> <button onclick="setTheme('light')">Light</button></div>
+<div class="grid">
+  <div class="gp-stage"><div class="gp-bg gp-blueprint gp-fade-corner"></div><b>01 Blueprint grid</b></div>
+  <div class="gp-stage"><div class="gp-bg gp-dots"></div><i class="gp-dot-hot" style="left:calc(20px*12 - 1px);top:calc(20px*4 - 1px)"></i><b>02 Square-dot grid</b></div>
+  <div class="gp-stage" id="contour"><b>03 Contour lines</b></div>
+  <div class="gp-stage"><canvas class="gp-bg" id="halftone"></canvas><b>04 Halftone</b></div>
+  <div class="gp-stage"><canvas class="gp-bg gp-pixelated" id="dither"></canvas><b>05 Dithered image</b></div>
+  <div class="gp-stage"><canvas class="gp-bg gp-pixelated" id="mosaic"></canvas><b>06 Pixel mosaic</b></div>
+  <div class="gp-stage"><canvas class="gp-bg" id="ascii"></canvas><b>07 ASCII and pixels</b></div>
+</div>
+<script src="backgrounds.js"></script>
+<script>
+  var B = AfterstreamBG, asc;
+  document.getElementById('contour').insertAdjacentHTML('afterbegin', B.contourSVG({ width: 1200, height: 675, seed: 21 }));
+  function paint() {
+    B.halftone(document.getElementById('halftone'));
+    B.dither(document.getElementById('dither'));            // pass { source: imgElement } to dither a real image
+    B.mosaic(document.getElementById('mosaic'));
+    asc ? asc.repaint() : (asc = B.ascii(document.getElementById('ascii'), { animate: true }));
+  }
+  function setTheme(t) { document.documentElement.setAttribute('data-theme', t); paint(); }
+  var q = new URLSearchParams(location.search).get('theme'); if (q) document.documentElement.setAttribute('data-theme', q);
+  paint(); addEventListener('resize', paint);
+</script>
+</body>
+</html>
