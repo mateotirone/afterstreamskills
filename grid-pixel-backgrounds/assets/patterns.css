@@ -1,0 +1,51 @@
+/* Grid and pixel backgrounds: the pure-CSS ones plus the theme tokens every painter reads.
+ * Put .gp-bg on an absolutely positioned layer behind your content (see demo.html).
+ * Swap the token values for your own brand. Defaults are Afterstream's.
+ */
+:root {
+  --bg-base: #0E0D0B;                       /* page or section color */
+  --bg-line: rgba(244,239,230,.07);         /* minor lines (contours) */
+  --bg-line-strong: rgba(244,239,230,.15);  /* major lines */
+  --bg-ascii: rgba(244,239,230,.2);         /* ASCII characters */
+  --bg-ink: #FF5B24;                        /* halftone, dither, hot tiles */
+  --bp-minor: rgba(91,200,255,.07); --bp-major: rgba(91,200,255,.16); --bp-label: rgba(91,200,255,.45);
+  --dot: rgba(244,239,230,.16); --dot-hot: #FF5B24;
+  --bg-px1: #15140f; --bg-px2: #1f1d18; --bg-px3: #2A5D78; --bg-px4: #5BC8FF;   /* mosaic, dark to bright */
+}
+/* Light theme. Covers an explicit data-theme="light" and "system" on a light device. */
+:root[data-theme="light"] {
+  --bg-base: #F6F3ED; --bg-line: rgba(14,13,11,.08); --bg-line-strong: rgba(14,13,11,.17); --bg-ascii: rgba(14,13,11,.22);
+  --bg-ink: #F0602C; --bp-minor: rgba(10,110,158,.08); --bp-major: rgba(10,110,158,.18); --bp-label: rgba(10,110,158,.6);
+  --dot: rgba(14,13,11,.18); --dot-hot: #E2501C;
+  --bg-px1: #F1EDE5; --bg-px2: #E8E2D7; --bg-px3: #CFE6F3; --bg-px4: #8CC8E6;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]):not([data-theme="light"]) {
+  --bg-base: #F6F3ED; --bg-line: rgba(14,13,11,.08); --bg-line-strong: rgba(14,13,11,.17); --bg-ascii: rgba(14,13,11,.22);
+  --bg-ink: #F0602C; --bp-minor: rgba(10,110,158,.08); --bp-major: rgba(10,110,158,.18); --bp-label: rgba(10,110,158,.6);
+  --dot: rgba(14,13,11,.18); --dot-hot: #E2501C;
+  --bg-px1: #F1EDE5; --bg-px2: #E8E2D7; --bg-px3: #CFE6F3; --bg-px4: #8CC8E6;
+} }
+
+.gp-stage { position: relative; isolation: isolate; overflow: hidden; background: var(--bg-base); }
+.gp-stage > .gp-bg, .gp-stage > canvas.gp-bg, .gp-stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+/* 1. Blueprint grid: minor 16px, major 96px (keep major a multiple of minor) */
+.gp-blueprint {
+  background-image:
+    linear-gradient(var(--bp-major) 1px, transparent 1px), linear-gradient(90deg, var(--bp-major) 1px, transparent 1px),
+    linear-gradient(var(--bp-minor) 1px, transparent 1px), linear-gradient(90deg, var(--bp-minor) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px, 16px 16px, 16px 16px;
+  background-position: -1px -1px;
+}
+
+/* 2. Square-dot grid: one conic-gradient paints a 2px square in each 20px tile */
+.gp-dots { background-image: conic-gradient(at 2px 2px, transparent 75%, var(--dot) 0); background-size: 20px 20px; }
+.gp-dot-hot { position: absolute; width: 4px; height: 4px; background: var(--dot-hot); }  /* left/top: calc(20px * n - 1px) */
+
+/* Fades. Keep the side with text calm. On phones text spans the full width, so fade from the top. */
+.gp-fade-left { -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.05) 10%, rgba(0,0,0,.6) 45%, #000 75%); mask-image: linear-gradient(90deg, rgba(0,0,0,.05) 10%, rgba(0,0,0,.6) 45%, #000 75%); }
+.gp-fade-corner { -webkit-mask-image: radial-gradient(120% 120% at 85% 30%, #000 30%, transparent 85%); mask-image: radial-gradient(120% 120% at 85% 30%, #000 30%, transparent 85%); }
+@media (max-width: 560px) {
+  .gp-fade-left, .gp-fade-corner { -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.04) 0%, rgba(0,0,0,.08) 50%, #000 92%); mask-image: linear-gradient(180deg, rgba(0,0,0,.04) 0%, rgba(0,0,0,.08) 50%, #000 92%); }
+}
+canvas.gp-pixelated { image-rendering: pixelated; image-rendering: crisp-edges; }
