@@ -101,6 +101,7 @@ Email clients don't run WebGL, and most ignore `backdrop-filter`. Bake an image:
 ```
 node assets/bake.mjs thermal 600 200 dark header-dark.png --time=9
 node assets/bake.mjs fluted 600 200 light header-light.png --time=4
+node assets/bake.mjs iridescent 600 200 dark card-header.png --time=9 --base=#26241F   # match the card it sits on
 node assets/bake.mjs photo 1280 720 dark thumb-bg.png --photo=https://example.com/frame.jpg
 ```
 - The same `--time` gives the same image, so bakes are repeatable. Try a few times and keep the best frame.
