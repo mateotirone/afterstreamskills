@@ -1,31 +1,46 @@
-/* Texture backgrounds. Drop-in, no requests: every texture is an inline SVG tile.
-   Usage: <section class="tex tex-paper" style="--tex-base:#F4EFE6">...</section>
-   The texture sits on ::before, behind content, so text and images are never filtered.
-   Dark values apply under [data-theme="dark"], .dark, or the OS dark setting
-   (unless [data-theme="light"] is set). */
-.tex{position:relative;isolation:isolate;background-color:var(--tex-base,transparent)}
-.tex::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
-  background-image:var(--tex-img);background-repeat:repeat;
-  mix-blend-mode:var(--tex-blend,soft-light);opacity:var(--tex-o,.5)}
-
-/* light */
-.tex-felt   {--tex-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' seed='3' stitchTiles='stitch' result='fuzz'/%3E%3CfeGaussianBlur in='fuzz' stdDeviation='0.45' result='soft'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.06' numOctaves='3' seed='9' stitchTiles='stitch' result='mottle'/%3E%3CfeComposite in='soft' in2='mottle' operator='arithmetic' k1='0' k2='0.85' k3='0.25' k4='-0.05' result='mix'/%3E%3CfeColorMatrix in='mix' type='matrix' values='2.2 0 0 0 -0.6 2.2 0 0 0 -0.6 2.2 0 0 0 -0.6 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23f)'/%3E%3C/svg%3E");--tex-blend:soft-light;--tex-o:.9}
-.tex-speckle{--tex-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cfilter id='d' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -40 10.8'/%3E%3C/filter%3E%3Cfilter id='l' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' seed='21' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 40 0 0 0 -29.4'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23d)'/%3E%3Crect width='320' height='320' filter='url(%23l)'/%3E%3C/svg%3E");--tex-blend:normal;--tex-o:.7}
-.tex-paper  {--tex-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.09 0.11' numOctaves='5' seed='5' stitchTiles='stitch' result='n'/%3E%3CfeDiffuseLighting in='n' surfaceScale='0.75' lighting-color='%23fff' diffuseConstant='1' result='lit'%3E%3CfeDistantLight azimuth='45' elevation='55'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' type='matrix' values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23p)'/%3E%3C/svg%3E");--tex-blend:multiply;--tex-o:.4}
-.tex-grain  {--tex-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1.4 0 0 0 -0.2 1.4 0 0 0 -0.2 1.4 0 0 0 -0.2 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");--tex-blend:overlay;--tex-o:.6}
-
-/* dark */
-[data-theme="dark"] .tex-felt,.dark .tex-felt{--tex-o:.5}
-[data-theme="dark"] .tex-speckle,.dark .tex-speckle{--tex-o:.8}
-[data-theme="dark"] .tex-paper,.dark .tex-paper{--tex-blend:soft-light;--tex-o:.7}
-[data-theme="dark"] .tex-grain,.dark .tex-grain{--tex-o:.3}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]) .tex-felt{--tex-o:.5}
-  :root:not([data-theme="light"]) .tex-speckle{--tex-o:.8}
-  :root:not([data-theme="light"]) .tex-paper{--tex-blend:soft-light;--tex-o:.7}
-  :root:not([data-theme="light"]) .tex-grain{--tex-o:.3}
+/* Texture backgrounds: felt, speckled graphite, paper and grain as inline SVG tiles (no requests),
+ * plus the theme tokens textures.js reads for grass and stipple.
+ * Put .tx-bg on a layer behind your content inside .tx-stage (see demo.html).
+ * Token names match grid-pixel-backgrounds (--bg-base, --bg-ink), so the two packs share a theme.
+ * Swap the values for your own brand. Defaults are Afterstream's.
+ */
+:root {
+  --bg-base: #0E0D0B;                       /* page or section color */
+  --bg-ink: #FF5B24;                        /* stipple dots */
+  --tx-felt: .5; --tx-speckle: .8; --tx-paper: .7; --tx-paper-blend: soft-light; --tx-grain: .3;
+  --tx-glow-1: rgba(255,91,36,.55); --tx-glow-2: rgba(42,93,120,.9);   /* grainy gradient colors */
+  --tx-grass-base: #1F4A61; --tx-grass-light: #5BC8FF; --tx-grass-dark: #0E0D0B;
 }
+/* Light theme. Covers an explicit data-theme="light" and "system" on a light device. */
+:root[data-theme="light"] {
+  --bg-base: #F6F3ED; --bg-ink: #F0602C;
+  --tx-felt: .9; --tx-speckle: .7; --tx-paper: .4; --tx-paper-blend: multiply; --tx-grain: .6;
+  --tx-glow-1: #FFB899; --tx-glow-2: #A9D3EA;
+  --tx-grass-base: #BFE0F2; --tx-grass-light: #FFFFFF; --tx-grass-dark: #2A5D78;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]):not([data-theme="light"]) {
+  --bg-base: #F6F3ED; --bg-ink: #F0602C;
+  --tx-felt: .9; --tx-speckle: .7; --tx-paper: .4; --tx-paper-blend: multiply; --tx-grain: .6;
+  --tx-glow-1: #FFB899; --tx-glow-2: #A9D3EA;
+  --tx-grass-base: #BFE0F2; --tx-grass-light: #FFFFFF; --tx-grass-dark: #2A5D78;
+} }
+
+.tx-stage { position: relative; isolation: isolate; overflow: hidden; background: var(--bg-base); }
+.tx-stage > .tx-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+/* 1. Felt: blurred fine noise + gentle mottling. Best on mid tones and color fills. */
+.tx-felt    { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' seed='3' stitchTiles='stitch' result='fuzz'/%3E%3CfeGaussianBlur in='fuzz' stdDeviation='0.45' result='soft'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.06' numOctaves='3' seed='9' stitchTiles='stitch' result='mottle'/%3E%3CfeComposite in='soft' in2='mottle' operator='arithmetic' k1='0' k2='0.85' k3='0.25' k4='-0.05' result='mix'/%3E%3CfeColorMatrix in='mix' type='matrix' values='2.2 0 0 0 -0.6 2.2 0 0 0 -0.6 2.2 0 0 0 -0.6 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23f)'/%3E%3C/svg%3E"); mix-blend-mode: soft-light; opacity: var(--tx-felt); }
+/* 2. Speckled graphite: sparse dark and light flecks. */
+.tx-speckle { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cfilter id='d' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -40 10.8'/%3E%3C/filter%3E%3Cfilter id='l' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' seed='21' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 40 0 0 0 -29.4'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23d)'/%3E%3Crect width='320' height='320' filter='url(%23l)'/%3E%3C/svg%3E"); opacity: var(--tx-speckle); }
+/* 3. Grass: canvas, see AfterstreamTX.grass() in textures.js. */
+/* 4. Paper: noise lit as a height map. */
+.tx-paper   { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.09 0.11' numOctaves='5' seed='5' stitchTiles='stitch' result='n'/%3E%3CfeDiffuseLighting in='n' surfaceScale='0.75' lighting-color='%23fff' diffuseConstant='1' result='lit'%3E%3CfeDistantLight azimuth='45' elevation='55'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' type='matrix' values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23p)'/%3E%3C/svg%3E"); mix-blend-mode: var(--tx-paper-blend); opacity: var(--tx-paper); }
+/* 5. Grainy gradient: put .tx-glow on the stage (or any box), then a .tx-bg.tx-grain layer inside it. */
+.tx-glow    { background-image: radial-gradient(60% 80% at 15% 10%, var(--tx-glow-1) 0%, transparent 70%),
+                                radial-gradient(70% 90% at 95% 100%, var(--tx-glow-2) 0%, transparent 70%); }
+.tx-grain   { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1.4 0 0 0 -0.2 1.4 0 0 0 -0.2 1.4 0 0 0 -0.2 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E"); mix-blend-mode: overlay; opacity: var(--tx-grain); }
+/* 6. Stippled gradient: canvas, see AfterstreamTX.stipple() in textures.js. */
 
 /* Textures are decoration. Drop them when the user asks for more contrast, and in print. */
-@media (prefers-contrast:more){.tex::before{display:none}}
-@media print{.tex::before{display:none}}
+@media (prefers-contrast: more) { .tx-bg { display: none; } }
+@media print { .tx-bg { display: none; } }

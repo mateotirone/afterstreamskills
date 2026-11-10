@@ -1,54 +1,93 @@
 ---
 name: texture-backgrounds
-description: Add tactile texture backgrounds (felt, speckled graphite, grass, paper, grainy gradients, stippled gradients) to web pages, apps, emails, thumbnails, or video frames so designs look less flat. Use when a design feels flat, plain, or "too digital", or when someone asks for grain, noise, paper, felt, speckle, stipple, or grass textures.
+description: Add tactile texture backgrounds (felt, speckled graphite, grass, paper, grainy gradients, stippled gradients) to a web page, app, email, thumbnail or video frame, in both light and dark mode. Use when a design looks flat or "too digital", or someone asks for grain, noise, paper, felt, speckle, stipple or grass.
 ---
 
 # Texture backgrounds
 
-Six textures that make a flat design feel physical, built with tiny inline SVG noise tiles and a little canvas. No image downloads, no libraries, and every one works in light and dark mode.
+Six textures that make a flat design feel physical, without a stock image. Each one reads its colors from CSS tokens so it works in light and dark mode, and can be baked to a PNG for places that can't run CSS or JS.
 
-| Texture | Feels like | Built with | Best for |
-|---|---|---|---|
-| Felt | soft, warm, tactile | SVG fractal noise, blurred, plus low mottling | cards, color panels, playful sections |
-| Speckled graphite | stone countertop, premium | two thresholded noise layers (dark and light flecks) | premium tiers, footers, dark surfaces |
-| Grass | turf from above, lively | canvas: thousands of short tapered blades in a seamless tile | sports and outdoor themes, thumbnails |
-| Paper | real paper, editorial | SVG noise lit with `feDiffuseLighting` | long reads, letters, notes, light mode |
-| Grainy gradient | film, glow, modern | radial gradients plus an overlay grain tile | heroes, sign-in pages, video backgrounds |
-| Stippled gradient | print, hand-drawn dots | canvas: dots on a jittered grid, ordered threshold | hero corners, thumbnails, section edges |
+Files in `assets/`:
+- `textures.css`: theme tokens, the four SVG-noise textures as inline tiles (no requests, under 1 KB each), the grainy gradient glow.
+- `textures.js`: the two canvas textures, grass and stipple. No dependencies, about 4 KB. Exposes `window.AfterstreamTX`.
+- `demo.html`: all six side by side with a theme switch. Open it first.
+- `bake.mjs`: renders any texture to a PNG with Playwright, for emails, thumbnails, OG images and video frames.
+- `felt.svg`, `speckle.svg`, `paper.svg`, `grain.svg`: readable sources of the inline tiles.
 
-Details, tuning knobs and pitfalls for each are in `references/<texture>.md`. Drop-in code is in `assets/`.
+Token names (`--bg-base`, `--bg-ink`) match the grid-pixel-backgrounds skill, so both packs share one theme.
 
-## How to apply one
+## Pick the right one
 
-1. **Pick for the job, not the trend.** One texture per screen. Texture goes on backgrounds and large surfaces, never on text, icons, inputs, tables, or anything someone reads for long.
-2. **Put the texture on a layer behind the content.** Use `assets/textures.css`: add `class="tex tex-paper"` and set `--tex-base` to the surface color. The texture lives on `::before` with a blend mode, so content is never filtered and the base color stays yours.
-3. **Tune it for each theme separately.** The same opacity never works in both. Light themes usually want `multiply` or `soft-light`; dark themes want `soft-light` or `overlay` at lower strength. The CSS ships tested values for both and switches on `[data-theme="dark"]`, `.dark`, or the OS setting.
-4. **Check contrast with the texture on.** Measure text against the darkest and lightest spots of the texture, not the base color. If it fails, lower opacity or keep text off the busy part (stipple and grass especially).
-5. **Respect settings.** The CSS turns textures off for `prefers-contrast: more` and in print. Keep that.
-6. **Look at it, fix it, look again.** Render a screenshot at 2x in both themes, look at it at full size, fix, and repeat at least three times before calling it done. Most first versions are too strong. Common fixes: too dense, too dark in dark mode, or reads as something else (rain, TV static, stucco).
+| Texture | Built with | Weight | Loudness | Best for |
+|---|---|---|---|---|
+| Felt | SVG noise, blurred, plus mottling | <1 KB | Quiet | Color panels, cards, friendly brand posts |
+| Speckled graphite | Two thresholded noise layers | <1 KB | Quiet | Premium plan cards, footers, dark surfaces |
+| Grass | Canvas blades in a seamless tile | ~2 KB JS | Loud | Sports, racing and outdoor themes, thumbnails |
+| Paper | SVG noise lit with `feDiffuseLighting` | <1 KB | Quiet | Article headers, letters, quotes, email headers |
+| Grainy gradient | Radial gradients + overlay grain | <1 KB | Medium | Heroes, sign-in pages, video backgrounds |
+| Stippled gradient | Canvas dots, ordered threshold | ~1 KB JS | Medium | Hero corners, empty states, thumbnails |
 
-## Building each kind of output
+Rules of thumb:
+- One texture per screen. Quiet ones can sit behind a whole section; loud ones only behind headlines or images.
+- Never put texture on text, icons, inputs or tables, and keep body text off grass and dense stipple.
+- Prefer the CSS textures when they fit. They are drawn once and never repaint.
 
-- **Websites and apps:** use the inline SVG tiles in `textures.css` (under 1 KB each, cached after the first paint). Never put `filter: url(#noise)` on a live element that scrolls or animates; filters recompute on every repaint. Background tiles are drawn once.
-- **Canvas textures (grass, stipple):** draw once on load and on resize, not every frame. `grassTile()` returns a data URL for a repeating background (about 15 ms). `stipple()` draws into a canvas sized to its box, capped at 2x pixel ratio.
-- **Emails:** email apps ignore SVG filters, blend modes and canvas. Bake the texture into a PNG or WebP (render the page and screenshot it), use it as an `<img>` or `background` on a header band, and always set a solid `bgcolor` fallback. Keep body text on a flat color.
-- **Video and thumbnails:** bake to an image or render in the browser, then composite. Keep grain **static** (moving grain eats bitrate and turns to mush when platforms re-encode) and at least 2 px per speck at 1080p so it survives compression. Thumbnails: put stipple or grain behind the subject, never under the title.
+Details, tuning knobs and pitfalls for each are in `references/<texture>.md`.
 
-## Baking a texture to a file
+## How to add one (web)
 
-```js
-// node bake.js  -> felt.png (Playwright is enough, no other deps)
-const {chromium}=require('playwright');const fs=require('fs');
-(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:256,height:256}});
-await p.setContent('<body style="margin:0">'+fs.readFileSync('assets/felt.svg','utf8')+'</body>');
-await p.screenshot({path:'felt.png',omitBackground:true});await b.close()})();
+1. Copy `textures.css` and (for grass or stipple) `textures.js` into the project. Change the token values to the brand's colors and keep the light block in sync with the dark one.
+2. Wrap the section in `.tx-stage` and put the texture layer first:
+   ```html
+   <section class="tx-stage" style="--bg-base:#F4EFE6">
+     <div class="tx-bg tx-paper"></div>
+     ...content...
+   </section>
+   ```
+   Grainy gradient: `<section class="tx-stage tx-glow"><div class="tx-bg tx-grain"></div>...`
+   Canvas textures, once the element has a size:
+   ```js
+   AfterstreamTX.grass(el);                                   // sets a repeating tile on el; colors from --tx-grass-*
+   AfterstreamTX.stipple(canvasEl, { angle: 45, from: -.9 }); // dots in --bg-ink, dense toward the top right
+   ```
+3. Repaint canvas textures after a theme change and after resize (debounce ~150 ms). CSS textures update on their own.
+4. In React or other frameworks, call the painters in an effect after mount, and again when the theme changes.
+
+## Light and dark
+
+- Never reuse one opacity for both themes. The tokens ship tested values: felt .9 / .5, speckle .7 / .8, paper .4 multiply / .7 soft-light, grain .6 / .3 (light / dark).
+- `multiply` only darkens, so it disappears on dark surfaces. Use `soft-light` or `overlay` there.
+- Felt and speckle read as static on near-black. Lift the base to a graphite (#26241F) in dark.
+- Grainy gradients need pale tints in light mode, or they turn muddy.
+- Check both themes at full size every time.
+
+## Performance and accessibility
+
+- Never put `filter: url(#noise)` on a live element that scrolls or animates. Filters recompute on every repaint; background tiles are drawn once.
+- Grass draws in about 15 ms. Stipple caps device pixel ratio at 2.
+- `textures.css` hides every `.tx-bg` for `prefers-contrast: more` and in print. Keep that.
+- Layers are decoration: `pointer-events: none`, and measure text contrast over the darkest and lightest spots of the texture, not the base color.
+
+## Emails, thumbnails and video
+
+Email clients ignore SVG filters, blend modes and canvas. Bake an image instead:
 ```
+node assets/bake.mjs paper 600 160 light header.png --base=#F4EFE6
+node assets/bake.mjs grain 1280 720 dark thumb-bg.png
+```
+- Always set a solid `bgcolor` behind the image so it degrades well when images are blocked. Keep email body text on a flat color.
+- Video: keep grain static (moving grain eats bitrate and turns to mush after platform re-encoding) and make specks at least 2 px at the final size.
+- Thumbnails: bake at the final size and keep the face and title over the calm area.
 
-Typical baked sizes as WebP: felt 34 KB, grain 19 KB, speckle 26 KB, paper 16 KB, grass 10 KB.
+Typical baked tile sizes as WebP: felt 34 KB, speckle 26 KB, grain 19 KB, paper 16 KB, grass 10 KB.
 
-## Output
+## Quality check before shipping
 
-When asked to add a texture: name the texture and why it fits, give the HTML/CSS (or the baked file and how to place it), and show light and dark screenshots you have already checked.
+Make it, look at it, fix it, at least three times. Each look means screenshots of light, dark, desktop and phone at full size. Check:
+- Is it too strong? Most first versions are.
+- Does it read as the intended material, not something else (rain, TV static, stucco, confetti)?
+- Can every line of text be read without effort over it?
+- Does it look intentional in both themes, or just faint in one?
 
 ---
 Part of the Afterstream skills pack. https://useafterstream.com
