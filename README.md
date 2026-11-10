@@ -13,6 +13,7 @@ Free Claude skills built from the same tools that run Afterstream. Each folder i
 | [algorithm-watcher](algorithm-watcher/SKILL.md) | Summarize how each platform's algorithm currently ranks short and long videos, and what that means for a creator. |
 | [youtube-packager](youtube-packager/SKILL.md) | Write YouTube titles, thumbnail concepts, chapters, and descriptions for a stream highlights video. |
 | [comment-replier](comment-replier/SKILL.md) | Draft replies to comments in the creator's voice and flag the ones that need a human. |
+| [less-generic-ui](less-generic-ui/SKILL.md) | Design or review a web page so it doesn't look AI-made: layout, motion and density dials, copy checker, light and dark. |
 
 ## Install
 
