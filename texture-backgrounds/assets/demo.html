@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Texture backgrounds demo</title>
+<link rel="stylesheet" href="textures.css">
+<style>
+  body { margin: 0; background: var(--bg-base); color: #888; font: 15px/1.4 system-ui, sans-serif; }
+  .grid { display: grid; gap: 16px; padding: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .tx-stage { aspect-ratio: 16 / 9; border-radius: 12px; border: 1px solid rgba(128,128,128,.2); }
+  .tx-stage b { position: absolute; left: 14px; top: 12px; font: 600 12px ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; }
+  .surface { --bg-base: #26241F; }  /* felt and speckle look best on a graphite surface in dark */
+  :root[data-theme="light"] .surface { --bg-base: #E9E2D6; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme]) .surface { --bg-base: #E9E2D6; } }
+  .bar { padding: 16px 16px 0; } .bar button { font: inherit; padding: 6px 12px; }
+</style>
+</head>
+<body>
+<div class="bar"><button onclick="setTheme('dark')">Dark</button> <button onclick="setTheme('light')">Light</button></div>
+<div class="grid">
+  <div class="tx-stage surface"><div class="tx-bg tx-felt"></div><b>01 Felt</b></div>
+  <div class="tx-stage surface"><div class="tx-bg tx-speckle"></div><b>02 Speckled graphite</b></div>
+  <div class="tx-stage"><div class="tx-bg" id="grass"></div><b>03 Grass</b></div>
+  <div class="tx-stage"><div class="tx-bg tx-paper"></div><b>04 Paper</b></div>
+  <div class="tx-stage tx-glow"><div class="tx-bg tx-grain"></div><b>05 Grainy gradient</b></div>
+  <div class="tx-stage"><canvas class="tx-bg" id="stipple"></canvas><b>06 Stippled gradient</b></div>
+</div>
+<script src="textures.js"></script>
+<script>
+  var T = AfterstreamTX;
+  function paint() { T.grass(document.getElementById('grass')); T.stipple(document.getElementById('stipple')); }
+  function setTheme(t) { document.documentElement.setAttribute('data-theme', t); paint(); }
+  var q = new URLSearchParams(location.search).get('theme'); if (q) document.documentElement.setAttribute('data-theme', q);
+  paint(); var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(paint, 150); });
+</script>
+</body>
+</html>
