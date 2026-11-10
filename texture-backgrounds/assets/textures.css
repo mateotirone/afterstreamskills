@@ -1,0 +1,31 @@
+/* Texture backgrounds. Drop-in, no requests: every texture is an inline SVG tile.
+   Usage: <section class="tex tex-paper" style="--tex-base:#F4EFE6">...</section>
+   The texture sits on ::before, behind content, so text and images are never filtered.
+   Dark values apply under [data-theme="dark"], .dark, or the OS dark setting
+   (unless [data-theme="light"] is set). */
+.tex{position:relative;isolation:isolate;background-color:var(--tex-base,transparent)}
+.tex::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+  background-image:var(--tex-img);background-repeat:repeat;
+  mix-blend-mode:var(--tex-blend,soft-light);opacity:var(--tex-o,.5)}
+
+/* light */
+.tex-felt   {--tex-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' seed='3' stitchTiles='stitch' result='fuzz'/%3E%3CfeGaussianBlur in='fuzz' stdDeviation='0.45' result='soft'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.06' numOctaves='3' seed='9' stitchTiles='stitch' result='mottle'/%3E%3CfeComposite in='soft' in2='mottle' operator='arithmetic' k1='0' k2='0.85' k3='0.25' k4='-0.05' result='mix'/%3E%3CfeColorMatrix in='mix' type='matrix' values='2.2 0 0 0 -0.6 2.2 0 0 0 -0.6 2.2 0 0 0 -0.6 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23f)'/%3E%3C/svg%3E");--tex-blend:soft-light;--tex-o:.9}
+.tex-speckle{--tex-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cfilter id='d' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -40 10.8'/%3E%3C/filter%3E%3Cfilter id='l' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' seed='21' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 40 0 0 0 -29.4'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23d)'/%3E%3Crect width='320' height='320' filter='url(%23l)'/%3E%3C/svg%3E");--tex-blend:normal;--tex-o:.7}
+.tex-paper  {--tex-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.09 0.11' numOctaves='5' seed='5' stitchTiles='stitch' result='n'/%3E%3CfeDiffuseLighting in='n' surfaceScale='0.75' lighting-color='%23fff' diffuseConstant='1' result='lit'%3E%3CfeDistantLight azimuth='45' elevation='55'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' type='matrix' values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23p)'/%3E%3C/svg%3E");--tex-blend:multiply;--tex-o:.4}
+.tex-grain  {--tex-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1.4 0 0 0 -0.2 1.4 0 0 0 -0.2 1.4 0 0 0 -0.2 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");--tex-blend:overlay;--tex-o:.6}
+
+/* dark */
+[data-theme="dark"] .tex-felt,.dark .tex-felt{--tex-o:.5}
+[data-theme="dark"] .tex-speckle,.dark .tex-speckle{--tex-o:.8}
+[data-theme="dark"] .tex-paper,.dark .tex-paper{--tex-blend:soft-light;--tex-o:.7}
+[data-theme="dark"] .tex-grain,.dark .tex-grain{--tex-o:.3}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .tex-felt{--tex-o:.5}
+  :root:not([data-theme="light"]) .tex-speckle{--tex-o:.8}
+  :root:not([data-theme="light"]) .tex-paper{--tex-blend:soft-light;--tex-o:.7}
+  :root:not([data-theme="light"]) .tex-grain{--tex-o:.3}
+}
+
+/* Textures are decoration. Drop them when the user asks for more contrast, and in print. */
+@media (prefers-contrast:more){.tex::before{display:none}}
+@media print{.tex::before{display:none}}
