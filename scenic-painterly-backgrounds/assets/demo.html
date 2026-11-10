@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scenic and painterly backgrounds demo</title>
+<link rel="stylesheet" href="patterns.css">
+<style>
+  body { margin: 0; background: var(--bg-base); color: #888; font: 15px/1.4 system-ui, sans-serif; }
+  .grid { display: grid; gap: 16px; padding: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .sc-stage { aspect-ratio: 16 / 9; border-radius: 12px; }
+  .sc-stage b { position: absolute; left: 14px; top: 12px; font: 600 12px ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: #F4EFE6; background: rgba(14,13,11,.5); padding: 4px 8px; border-radius: 6px; }
+  .bar { padding: 16px 16px 0; display: flex; gap: 8px; flex-wrap: wrap; } .bar button { font: inherit; padding: 6px 12px; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <button onclick="setTheme('dark')">Dark</button> <button onclick="setTheme('light')">Light</button>
+  <button onclick="setHue('#5BC8FF')">Blue</button> <button onclick="setHue('#FF5B24')">Orange</button> <button onclick="setHue('#7BD88F')">Green</button>
+</div>
+<div class="grid">
+  <div class="sc-stage" id="land"><b>01 Single-hue landscape</b></div>
+  <div class="sc-stage"><canvas class="sc-bg" id="sky"></canvas><b>02 Cloud sky</b></div>
+  <div class="sc-stage"><canvas class="sc-bg" id="paint"></canvas><b>03 Impressionist painting</b></div>
+</div>
+<script src="backgrounds.js"></script>
+<script>
+  var S = AfterstreamScenic;
+  function paint() {
+    var warm = S.toOklch(getComputedStyle(document.documentElement).getPropertyValue('--sc-hue').trim())[1] > 0.15;
+    S.landscape(document.getElementById('land'), { seed: 7, chroma: warm ? 1.5 : 1 });
+    S.sky(document.getElementById('sky'), { seed: 3 });
+    S.paint(document.getElementById('paint'), { seed: 5 });   // pass { source: imgElement } to paint a real picture
+  }
+  function setTheme(t) { document.documentElement.setAttribute('data-theme', t); paint(); }
+  function setHue(h) { document.documentElement.style.setProperty('--sc-hue', h); paint(); }
+  var q = new URLSearchParams(location.search).get('theme'); if (q) document.documentElement.setAttribute('data-theme', q);
+  paint(); var t; addEventListener('resize', function () { clearTimeout(t); t = setTimeout(paint, 150); });
+</script>
+</body>
+</html>
