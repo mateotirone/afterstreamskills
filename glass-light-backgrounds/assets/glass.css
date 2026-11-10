@@ -1,0 +1,51 @@
+/* Glass and light backgrounds: theme tokens + the CSS-only pieces (blurred photo, glass card, fallbacks).
+ * The WebGL effects in glass.js read these same tokens, so changing a value here recolors everything.
+ * Token names match the other Afterstream background skills (--bg-base, --bg-ink). Defaults are Afterstream's.
+ */
+:root {
+  --bg-base: #0E0D0B;            /* page or section color */
+  --bg-ink: #FF5B24;             /* the hot accent: blobs, thermal hot zone, iridescent warm side */
+  --gl-cool: #5BC8FF;            /* cool accent: blobs, thermal mid, iridescent cool side */
+  --gl-cool-ink: #5BC8FF;        /* cool accent used as a crisp shape or line (darker in light mode) */
+  --gl-deep: #2A5D78;            /* deep, quiet fill: big soft blob, thermal cold zone, water tint */
+  --gl-warm: #FFE08A;            /* thermal: between cool and hot */
+  --gl-hot: #FFF2E0;             /* thermal: hottest point (glows white in dark, burns deep in light) */
+  --gl-text: #F4EFE6;            /* text color; also thin lines drawn inside effects */
+  --gl-glass: rgba(14,13,11,.55);        /* frosted card over an effect */
+  --gl-glass-line: rgba(244,239,230,.14);
+  --gl-scrim: linear-gradient(180deg, rgba(14,13,11,.15), rgba(14,13,11,.62));  /* over a blurred photo */
+}
+:root[data-theme="light"] {
+  --bg-base: #F6F3ED; --bg-ink: #FF5B24; --gl-cool: #5BC8FF; --gl-cool-ink: #0A6E9E; --gl-deep: #D3EAF6;
+  --gl-warm: #FFD46B; --gl-hot: #C83E0D; --gl-text: #0E0D0B;
+  --gl-glass: rgba(255,255,255,.62); --gl-glass-line: rgba(255,255,255,.75);
+  --gl-scrim: linear-gradient(180deg, rgba(246,243,237,.45), rgba(246,243,237,.80));
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]):not([data-theme="light"]) {
+  --bg-base: #F6F3ED; --bg-ink: #FF5B24; --gl-cool: #5BC8FF; --gl-cool-ink: #0A6E9E; --gl-deep: #D3EAF6;
+  --gl-warm: #FFD46B; --gl-hot: #C83E0D; --gl-text: #0E0D0B;
+  --gl-glass: rgba(255,255,255,.62); --gl-glass-line: rgba(255,255,255,.75);
+  --gl-scrim: linear-gradient(180deg, rgba(246,243,237,.45), rgba(246,243,237,.80));
+} }
+
+/* Same stage pattern as the other background skills: background layer first, content after. */
+.gp-stage { position: relative; isolation: isolate; overflow: hidden; background: var(--bg-base); }
+.gp-stage > .gp-bg, .gp-stage > canvas.gp-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; display: block; }
+.gp-stage > canvas.gl-interactive { pointer-events: auto; }
+
+/* Frosted card that sits on any effect and stays readable */
+.gl-card { background: var(--gl-glass); border: 1px solid var(--gl-glass-line); color: var(--gl-text); border-radius: 14px;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); }
+
+/* Blurred photo: set --gl-photo on the stage, e.g. style="--gl-photo:url(frame.jpg)".
+ * The layer is oversized so the soft edges of the blur never show. */
+.gl-photo::before { content: ""; position: absolute; inset: -80px; z-index: -2; background: var(--gl-photo) center / cover;
+  filter: blur(40px) saturate(1.9) brightness(1.08); }
+.gl-photo::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--gl-scrim); }
+@media (prefers-reduced-transparency: reduce) { .gl-photo::before { filter: none; opacity: .15; } }
+
+/* Fallbacks shown when WebGL is missing (glass.js adds .gl-fallback-<effect>) */
+.gl-fallback-fluted { background: repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0 2px, transparent 2px 26px), linear-gradient(110deg, var(--gl-deep), var(--gl-cool) 55%, var(--bg-ink)); }
+.gl-fallback-lens, .gl-fallback-ripples { background: radial-gradient(60% 80% at 30% 40%, var(--bg-ink), transparent 70%), radial-gradient(60% 80% at 75% 60%, var(--gl-cool), transparent 70%), var(--bg-base); }
+.gl-fallback-iridescent { background: conic-gradient(from 200deg at 60% 50%, var(--gl-cool), #c9a7ff, var(--bg-ink), var(--gl-warm), var(--gl-cool)); }
+.gl-fallback-thermal { background: radial-gradient(40% 55% at 70% 60%, var(--gl-hot), var(--bg-ink) 25%, var(--gl-warm) 45%, var(--gl-cool) 70%, var(--gl-deep) 100%); }

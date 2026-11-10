@@ -13,6 +13,7 @@ Free Claude skills built from the same tools that run Afterstream. Each folder i
 | [algorithm-watcher](algorithm-watcher/SKILL.md) | Summarize how each platform's algorithm currently ranks short and long videos, and what that means for a creator. |
 | [youtube-packager](youtube-packager/SKILL.md) | Write YouTube titles, thumbnail concepts, chapters, and descriptions for a stream highlights video. |
 | [comment-replier](comment-replier/SKILL.md) | Draft replies to comments in the creator's voice and flag the ones that need a human. |
+| [glass-light-backgrounds](glass-light-backgrounds/SKILL.md) | Add fluted glass, lens distortion, iridescent shapes, thermal gradient, water ripple and blurred photo backgrounds, in light and dark. |
 
 ## Install
 
