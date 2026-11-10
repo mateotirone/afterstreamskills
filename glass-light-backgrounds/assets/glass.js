@@ -45,7 +45,6 @@ vec3 behind(vec2 p,float asp,float t){
   vec2 bq=p-vec2(asp*(.30+.06*cos(t*.15)),.30);
   float bar=length(max(abs(bq)-vec2(.20,.035),0.))-.03;
   col=mix(col,u_cool_ink,smoothstep(.006,0.,bar));  // cyan pill
-  col=mix(col,u_text,smoothstep(.004,0.,abs(p.y-.82-.03*sin(p.x*3.+t*.3))-.004)*.45); // thin line
   return col;
 }
 void main(){
@@ -157,6 +156,7 @@ void main(){
 }
 `,
     'thermal-gradient': `
+uniform vec3 u_heat[16];uniform float u_heatN;
 // Thermal gradient: a heat field mapped through a thermal-camera ramp (cool cyan -> hot orange).
 vec3 ramp(float v){
   vec3 s0=u_base;
@@ -176,9 +176,20 @@ void main(){
   vec2 p=uv*vec2(asp,1.); float t=u_time*.12;
   vec2 w=p+.35*vec2(fbm(p*1.1+t),fbm(p*1.1-t+5.2));       // domain warp = fluid shapes
   float v=fbm(w*1.4+vec2(t,-t*.7))*.65;
-  v+=blob(w,vec2(asp*(.70+.08*sin(t*2.)),.38+.1*cos(t*1.6)),.30)*.45;
-  v+=blob(w,vec2(asp*(.48+.1*cos(t*1.1)),.20),.20)*.25;
-  v+=blob(p,vec2(asp*(.25+.06*cos(t*1.3)),.72),.22)*.30;
+  if(u_heatN>0.){                                       // data mode: one hot spot per point (x, y, weight 0..1)
+    v*=.75;
+    float sc=clamp(asp/3.,.5,1.);                      // narrow stages (phones): smaller spots
+    for(int i=0;i<16;i++){
+      if(float(i)>=u_heatN)break;
+      vec3 h=u_heat[i];
+      vec2 c=vec2(h.x*asp+.03*sin(t*1.7+float(i)),h.y+.04*cos(t*1.3+float(i)*1.7));
+      v+=blob(w,c,(.20+.16*h.z)*sc)*(.30+.45*h.z);
+    }
+  }else{                                                // ambient mode: a few slow hot spots
+    v+=blob(w,vec2(asp*(.70+.08*sin(t*2.)),.38+.1*cos(t*1.6)),.30)*.45;
+    v+=blob(w,vec2(asp*(.48+.1*cos(t*1.1)),.20),.20)*.25;
+    v+=blob(p,vec2(asp*(.25+.06*cos(t*1.3)),.72),.22)*.30;
+  }
   v=clamp(v*1.05-.08,0.,1.);
   float bands=floor(v*14.)/14.;                         // faint isotherm bands
   v=mix(v,bands,.18);
