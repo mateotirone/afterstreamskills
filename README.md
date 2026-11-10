@@ -13,6 +13,7 @@ Free Claude skills built from the same tools that run Afterstream. Each folder i
 | [algorithm-watcher](algorithm-watcher/SKILL.md) | Summarize how each platform's algorithm currently ranks short and long videos, and what that means for a creator. |
 | [youtube-packager](youtube-packager/SKILL.md) | Write YouTube titles, thumbnail concepts, chapters, and descriptions for a stream highlights video. |
 | [comment-replier](comment-replier/SKILL.md) | Draft replies to comments in the creator's voice and flag the ones that need a human. |
+| [scenic-painterly-backgrounds](scenic-painterly-backgrounds/SKILL.md) | Add single-hue landscapes, cloud skies or impressionist paintings to pages, emails, thumbnails and videos, generated from code in any brand colour, light and dark. |
 
 ## Install
 
